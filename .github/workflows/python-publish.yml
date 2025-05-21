@@ -1,0 +1,29 @@
+name: Python application
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Build binary
+        run: |
+          pyinstaller --clean --noconfirm --onefile --nowindow --distpath dist/ --workpath /tmp main.py
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+        run: >-
+          gh release create ${{ github.ref_name }} ${{ github.workspace }}/dist/* --generate-notes --title "Version ${{ github.ref_name }}"
