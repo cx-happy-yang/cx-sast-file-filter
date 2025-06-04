@@ -142,6 +142,10 @@ if __name__ == '__main__':
     absolute_path_str = str(os.path.normpath(path.absolute()))
 
     for base, dirs, files in os.walk(absolute_path_str):
+        path_folders = base.split(os.sep)
+        evaluate_dot_git_folder = True
+        if any([should_be_excluded(exclude_folders, folder) for folder in path_folders]):
+            continue
         for file in files:
             file_name = file.lower()
             file_path = Path(os.path.join(base, file))
